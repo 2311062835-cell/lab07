@@ -210,6 +210,74 @@ h2 {
   margin-bottom: 16px;
 }
 
+.course-form-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.course-form-panel h3 {
+  margin: 0 0 4px;
+}
+
+.course-form-panel input,
+.search-form input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 40px;
+  font-size: 15px;
+}
+
+.course-form-panel input:focus,
+.search-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 0 0 2px;
+}
+
+.form-actions,
+.search-form,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-form {
+  min-width: min(100%, 390px);
+}
+
+.search-form input {
+  flex: 1;
+}
+
+.course-list-wrap {
+  margin-top: 16px;
+}
+
+.pagination {
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.no-seats {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.error-panel {
+  padding: 12px 0;
+}
+
 .course-form input {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -371,6 +439,15 @@ th {
 
   .course-form {
     grid-template-columns: 1fr;
+  }
+
+  .page-heading,
+  .search-form {
+    align-items: stretch;
+  }
+
+  .search-form {
+    width: 100%;
   }
 
   table {

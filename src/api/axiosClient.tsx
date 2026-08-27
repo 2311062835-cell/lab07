@@ -8,19 +8,12 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use((config) => {
-  const raw = localStorage.getItem("crs_auth_session");
-  if (!raw) {
+  const token = localStorage.getItem("crs_token");
+  if (!token) {
     return config;
   }
 
-  try {
-    const session = JSON.parse(raw) as { token?: string };
-    if (session.token) {
-      config.headers.Authorization = `Bearer ${session.token}`;
-    }
-  } catch {
-    localStorage.removeItem("crs_auth_session");
-  }
+  config.headers.Authorization = `Bearer ${token}`;
 
   return config;
 });
@@ -29,11 +22,16 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("crs_auth_session");
-      window.dispatchEvent(new Event("crs:session-expired"));
+      const tokenWasPresent = Boolean(localStorage.getItem("crs_token"));
 
-      if (window.location.pathname !== "/login") {
-        window.location.replace("/login");
+      if (tokenWasPresent) {
+        localStorage.removeItem("crs_token");
+        localStorage.removeItem("crs_auth_session");
+        window.dispatchEvent(new Event("crs:session-expired"));
+
+        if (window.location.pathname !== "/login") {
+          window.location.replace("/login");
+        }
       }
     }
 

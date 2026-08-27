@@ -5,6 +5,7 @@ import type { LoginRequest, UserSession } from "../types/auth";
 import { AuthContext } from "./authContextInstance";
 
 const AUTH_STORAGE_KEY = "crs_auth_session";
+const TOKEN_STORAGE_KEY = "crs_token";
 
 function getInitialSession(): UserSession | null {
   const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -34,11 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (payload: LoginRequest) => {
     const session = await loginApi(payload);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+    localStorage.setItem(TOKEN_STORAGE_KEY, session.token);
     setUser(session);
   };
 
   const logout = () => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
     setUser(null);
   };
 

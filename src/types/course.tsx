@@ -5,6 +5,18 @@ export interface Course {
   soChoToiDa: number;
   soChoConLai: number;
 }
+
+export interface CourseFormValues {
+  tenMonHoc: string;
+  soTinChi: string;
+  soChoToiDa: string;
+}
+
+export const emptyCourseForm: CourseFormValues = {
+  tenMonHoc: "",
+  soTinChi: "",
+  soChoToiDa: "",
+};
 // Khop voi cau truc Page<CourseDTO> ma Spring Data JPA tra ve (Buoi3, muc A)
 export interface PagedResponse<T> {
   content: T[];

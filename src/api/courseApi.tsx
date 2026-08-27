@@ -1,5 +1,5 @@
 import axiosClient from "./axiosClient";
-import type { Course } from "../types/course";
+import type { Course, CourseFormValues, PagedResponse } from "../types/course";
 
 type RawCourse = {
 	id?: number;
@@ -13,12 +13,6 @@ type RawCourse = {
 	so_cho_con_lai?: number;
 };
 
-export interface CoursePayload {
-	tenMonHoc: string;
-	soTinChi: number;
-	soChoToiDa: number;
-}
-
 function normalizeCourse(item: RawCourse): Course {
 	return {
 		id: item.id ?? 0,
@@ -29,22 +23,43 @@ function normalizeCourse(item: RawCourse): Course {
 	};
 }
 
-export async function getCourses(keyword?: string, page = 0, size = 20): Promise<Course[]> {
-	const { data } = await axiosClient.get<RawCourse[] | { content: RawCourse[] }>("/api/courses", {
+export async function getCourses(keyword?: string, page = 0, size = 10): Promise<PagedResponse<Course>> {
+	const { data } = await axiosClient.get<RawCourse[] | { content: RawCourse[]; totalElements?: number; totalPages?: number; number?: number; size?: number }>("/api/courses", {
 		params: { keyword, page, size },
 	});
 
-	const list = Array.isArray(data) ? data : data.content ?? [];
-	return list.map(normalizeCourse);
+	if (Array.isArray(data)) {
+		const allCourses = data.map(normalizeCourse);
+		const start = page * size;
+		const content = allCourses.slice(start, start + size);
+		return { content, totalElements: allCourses.length, totalPages: Math.ceil(allCourses.length / size), number: page, size };
+	}
+
+	const content = (data.content ?? []).map(normalizeCourse);
+	return {
+		content,
+		totalElements: data.totalElements ?? content.length,
+		totalPages: data.totalPages ?? (content.length ? 1 : 0),
+		number: data.number ?? page,
+		size: data.size ?? size,
+	};
 }
 
-export async function createCourse(payload: CoursePayload): Promise<Course> {
-	const { data } = await axiosClient.post<RawCourse>("/api/courses", payload);
+function toPayload(values: CourseFormValues) {
+	return {
+		tenMonHoc: values.tenMonHoc.trim(),
+		soTinChi: Number(values.soTinChi),
+		soChoToiDa: Number(values.soChoToiDa),
+	};
+}
+
+export async function createCourse(values: CourseFormValues): Promise<Course> {
+	const { data } = await axiosClient.post<RawCourse>("/api/courses", toPayload(values));
 	return normalizeCourse(data);
 }
 
-export async function updateCourse(id: number, payload: CoursePayload): Promise<Course> {
-	const { data } = await axiosClient.put<RawCourse>(`/api/courses/${id}`, payload);
+export async function updateCourse(id: number, values: CourseFormValues): Promise<Course> {
+	const { data } = await axiosClient.put<RawCourse>(`/api/courses/${id}`, toPayload(values));
 	return normalizeCourse(data);
 }
 
